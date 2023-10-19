@@ -211,7 +211,9 @@ class CapsuleFrag(Serializable, Deserializable):
 
         if not (correct_reencryption_of_e and correct_reencryption_of_v and correct_rk_commitment):
             raise VerificationError("Failed to verify reencryption proof")
-
+        else:
+            print("Successfully verifying proofs of re-encryption correctness!")
+            
         return VerifiedCapsuleFrag(self)
 
 

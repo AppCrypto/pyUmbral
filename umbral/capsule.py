@@ -120,6 +120,7 @@ class Capsule(Serializable, Deserializable):
         g = CurvePoint.generator()
         e, v, s = self._components()
         h = hash_capsule_points(e, v)
+        # sec 3.2.3  CheckCapsule 
         return g * s == v + (e * h)
 
     def __eq__(self, other):
