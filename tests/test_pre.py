@@ -48,7 +48,7 @@ def test_simple_api(shares, threshold):
     Alice, re-encryption by Ursula, and decryption by Bob.
     """
 
-    # Delegator (Hospital/Bank)
+    # Delegator (Hospital/Bank, VC issuer)
     # Key Generation (Alice)
     delegating_sk = SecretKey.random()
     delegating_pk = delegating_sk.public_key()
@@ -58,32 +58,33 @@ def test_simple_api(shares, threshold):
     signer = Signer(signing_sk)
     verifying_pk = signing_sk.public_key()
 
-    # Delegatee (Insurance company)
+    # Delegatee (Insurance company, VC verifier)
     # Key Generation (Bob)
     receiving_sk = SecretKey.random()
     receiving_pk = receiving_sk.public_key()
 
-    # Proxy (Patient)
+    # Delegator (Hospital/Bank, VC issuer)
     # Encryption by an unnamed data source
     plaintext = b'peace at dawn'
     capsule, ciphertext = encrypt(delegating_pk, plaintext)
+    # TODO (capsule,ciphertext) needs to be BLS signed
 
     # Decryption by Alice
     plaintext_decrypted = decrypt_original(delegating_sk, capsule, ciphertext)
     assert plaintext_decrypted == plaintext
 
-    # Delegator (Hospital/Bank)
+    # Delegator (Hospital/Bank, VC issuer)
     # Split Re-Encryption Key Generation (aka Delegation)    
     kfrags = generate_kfrags(delegating_sk=delegating_sk,
                              receiving_pk=receiving_pk,
                              signer=signer,
                              threshold=threshold,
                              shares=shares)
-    # Proxy (Patient)
+    # Proxy (Patient, VC holder)
     # Bob requests re-encryption to some set of M ursulas
     cfrags = [reencrypt(capsule, kfrag) for kfrag in kfrags]
 
-    # Delegatee (Insurance company)
+    # Delegatee (Insurance company, VC verifier)
     # Decryption by Bob
     plaintext_reenc = decrypt_reencrypted(receiving_sk=receiving_sk,
                                           delegating_pk=delegating_pk,
